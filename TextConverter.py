@@ -1,5 +1,6 @@
-from PyQt6.QtWidgets import QLabel, QDialog
+from PyQt6.QtWidgets import QDialog, QGraphicsView, QGraphicsScene, QVBoxLayout, QGraphicsPixmapItem, QSizePolicy
 from PyQt6.QtGui import QPixmap
+from PyQt6.QtCore import Qt
 #from PIL import Image, ImageDraw, ImageFont
 
 class TextConverterMenu(QDialog):
@@ -10,11 +11,37 @@ class TextConverterMenu(QDialog):
         self.setMinimumSize(self.window_width, self.window_height)
         self.setWindowTitle("Text Converter")
  
-        label = QLabel(self)
+        layout = QVBoxLayout(self)
+
+        # Create QGraphicsView and QGraphicsScene
+        self.graphicsView = QGraphicsView(self)
+        self.graphicsScene = QGraphicsScene(self)
+        self.graphicsView.setScene(self.graphicsScene)
+        layout.addWidget(self.graphicsView)
+        
+        # Load the image
         pixmap = QPixmap(image_path)
-        label.setPixmap(pixmap)
- 
+        item = QGraphicsPixmapItem(pixmap)
+        self.graphicsScene.addItem(item)
+        
+        # Set the view size policy to allow resizing
+        self.graphicsView.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
+        # Enable scroll bars for zooming
+        self.graphicsView.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        self.graphicsView.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+
+        # Connect the zoom functionality to the wheel event
+        self.graphicsView.wheelEvent = self.zoom
+        
         self.show()
+        
+    def zoom(self, event):
+        factor = 1.025
+        if event.angleDelta().y() < 0:
+            factor = 1.0 / factor
+
+        self.graphicsView.setTransform(self.graphicsView.transform().scale(factor, factor))
         
     #def add3dText():
         # with Image.open("chell.jpg") as im:
