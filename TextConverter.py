@@ -1,13 +1,14 @@
+from SelectionMenu import TextDefMenu 
 from PyQt6.QtWidgets import QDialog, QGraphicsView, QGraphicsScene, QVBoxLayout, QGraphicsPixmapItem, QSizePolicy, QWidget, QPushButton, QHBoxLayout, QSplitter
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 from PIL import Image, ImageDraw, ImageFont
 
 class TextConverterMenu(QDialog):
-    def __init__(self, image_path):
-        super().__init__()
+    def __init__(self, image_path, parent=None):
+        super().__init__(parent)
         
-        self.image_path = image_path;
+        self.image_path = image_path
 
         self.window_width, self.window_height = 800, 500
         self.setMinimumSize(self.window_width, self.window_height)
@@ -61,27 +62,23 @@ class TextConverterMenu(QDialog):
         
     def add3dText(self):
         with Image.open(self.image_path) as im:
-            px = im.load()
-            
-            fontsize = int(input("fontsize: "))
-            title = input("title: ")
+            self.setDisabled(True)
+            self.openTextDefMenu()
+            title, fontsize, depth = 'AAA', 200, 50 # TEMPORARY    
+            font = ImageFont.truetype("arial.ttf", fontsize)  # Specify your font file and size
             
             draw = ImageDraw.Draw(im)
-            font = ImageFont.truetype("arial.ttf", fontsize)  # Specify your font file and size
-            depth = int(input("depth: "))
-
             text_position = (0, 0)  # Position of the text
-            a = 0
             for i in range(depth):
                 text_color = (i, i, i)  # RGB color for the text
                 text_position = (0 + i, 10 + i)  # Position of the text
                 draw.text(text_position, title, font=font, fill=text_color)
-                a = i
             text_color = (0, 255, 255)
             draw.text(text_position, title, font=font, fill=text_color)
             im.save("output.png")
             print("IMAGE SAVED")
             self.updatePreview()
+            self.setDisabled(False)
         
     def updatePreview(self):
         # Update QGraphicsScene with the modified image
@@ -92,6 +89,12 @@ class TextConverterMenu(QDialog):
 
         # Set the new scene to the graphicsView
         self.graphicsView.setScene(self.graphicsScene)
+        
+    def openTextDefMenu(self):
+        pass
+        textDefMenu = TextDefMenu()
+        textDefMenu.exec()
+        
         
         
         
