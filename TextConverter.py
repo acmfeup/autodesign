@@ -38,9 +38,15 @@ class TextConverterMenu(QDialog):
         user_menu_widget.setLayout(user_menu_layout)
         button1 = QPushButton("Add 3D text")
         button1.pressed.connect(self.add3dText)
-        button2 = QPushButton("Button 2")
+        button2 = QPushButton("Add Image")
+        button3 = QPushButton("Edit Layers")
+        button4 = QPushButton("Save Image")
+
         user_menu_layout.addWidget(button1)
         user_menu_layout.addWidget(button2)
+        user_menu_layout.addWidget(button3)
+        user_menu_layout.addWidget(button4)
+
         splitter.addWidget(user_menu_widget)
         splitter.setSizes([int(self.window_width * 0.75), int(self.window_width * 0.25)])
 

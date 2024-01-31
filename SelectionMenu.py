@@ -1,7 +1,6 @@
-from PyQt6.QtWidgets import QPushButton, QVBoxLayout, QDialog, QLineEdit
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtWidgets import QPushButton, QDialog, QLineEdit, QComboBox, QLabel, QGridLayout, QColorDialog, QCheckBox, QSpinBox
 from PyQt6.QtCore import Qt
-from PIL import Image, ImageDraw, ImageFont
+from PIL import ImageFont
 
 class TextDefMenu(QDialog):
     def __init__(self):
@@ -13,39 +12,59 @@ class TextDefMenu(QDialog):
         self.depth = 50
         
         # Window
-        self.window_width, self.window_height = 800, 500
+        self.window_width, self.window_height = 600, 300
         self.setMinimumSize(self.window_width, self.window_height)
         
-        # General Layout
-        layout = QVBoxLayout()
-        self.setLayout(layout)
-
-        # Textbox for fontsize
-        self.input1 = QLineEdit()
-        self.input1.setFixedWidth(150)
-        layout.addWidget(self.input1)
-        # Textbox for title
-        self.input2 = QLineEdit()
-        self.input2.setFixedWidth(150)
-        layout.addWidget(self.input2)
-        # Textbox for depth
-        self.input3 = QLineEdit()
-        self.input3.setFixedWidth(150)
-        layout.addWidget(self.input3)
+        # Create Buttons, ComboBoxes,...
+        self.fontLabel = QLabel('Font')  
+        self.fontBox = QComboBox()        # Combobox for font
+        self.textColorLabel = QLabel('Text Color')  
+        self.textColorDialog = QColorDialog()         # Textbox for color
+        self.textColorDialog.setFixedWidth(150)
+        self.textLabel = QLabel('Text')  
+        self.titleTextbox = QLineEdit()         # Textbox for title
+        self.titleTextbox.setFixedWidth(150)
+        self.fontSizeLabel = QLabel('Font Size')  
+        self.sizeSpinbox = QSpinBox()         # Spinbox for size
+        self.sizeSpinbox.setRange(1, 1000)   # TODO: adjust range to an appropriate value
+        self.sizeSpinbox.setFixedWidth(150)
+        self.threeDLabel = QLabel('3D')  
+        self.threeDCheckBox = QCheckBox() # Checkbox for 3D Text
+        # TODO: Add Textbox for 3D Depth, in case 3D is selected 
+        self.button2 = QPushButton('Create text without an image')   # Button to confirm all textboxes
+        self.button2.clicked.connect(self.getUserOptions)
+          
+        # Create grid layout
+        self.layout = QGridLayout()
+        self.layout.addWidget(self.fontLabel, 0, 0)
+        self.layout.addWidget(self.fontBox, 0, 1)
+        self.layout.addWidget(self.textColorLabel, 1, 0)
+        self.layout.addWidget(self.textColorDialog, 1, 1)
+        self.layout.addWidget(self.textLabel, 2, 0)
+        self.layout.addWidget(self.titleTextbox, 2, 1)
+        self.layout.addWidget(self.fontSizeLabel, 3, 0)
+        self.layout.addWidget(self.sizeSpinbox, 3, 1)
+        self.layout.addWidget(self.threeDLabel, 4, 0)
+        self.layout.addWidget(self.threeDCheckBox, 4, 1)
+        self.layout.addWidget(self.button2, 5, 0, 1, 2)  # span two columns for the button
         
-        # Button to confirm all textboxes
-        button2 = QPushButton("Create text without an image")
-        button2.clicked.connect(self.getUserOptions)
-        layout.addWidget(button2)
+        # Set column stretch to push items to the top
+        self.layout.setColumnStretch(0, 1)
+        self.layout.setColumnStretch(1, 1)
+
+        # Set layout
+        self.setLayout(self.layout)
 
         # Show window
         self.show()
+
     
     def get(self):
         # Parse data
-        self.fontsize = int(self.input1.text())
-        self.title = str(self.input2.text())
-        self.depth = int(self.input3.text())
+        self.fontsize = int(self.textColorDialog.text())  # TODO: fix
+        self.title = str(self.titleTextbox.text())
+        self.depth = int(self.sizeSpinbox.text())
+        
     
     def getUserOptions(self):
         self.get()
