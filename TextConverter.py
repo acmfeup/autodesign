@@ -1,6 +1,6 @@
 from SelectionMenu import TextDefMenu 
 from PyQt6.QtWidgets import QDialog, QGraphicsView, QGraphicsScene, QVBoxLayout, QGraphicsPixmapItem, QSizePolicy, QWidget, QPushButton, QHBoxLayout, QSplitter
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QPixmap, QIcon
 from PyQt6.QtCore import Qt
 from PIL import Image, ImageDraw, ImageFont
 
@@ -12,7 +12,8 @@ class TextConverterMenu(QDialog):
 
         self.window_width, self.window_height = 800, 500
         self.setMinimumSize(self.window_width, self.window_height)
-        self.setWindowTitle("Text Converter")
+        self.setWindowTitle("Autodesign")
+        self.setWindowIcon(QIcon("Resources/Icons/ACM_logo.jpg"))  # Provide the path to your icon image
  
         main_layout = QHBoxLayout(self)
         
@@ -36,7 +37,7 @@ class TextConverterMenu(QDialog):
         user_menu_layout = QVBoxLayout()
         user_menu_widget = QWidget(self)
         user_menu_widget.setLayout(user_menu_layout)
-        button1 = QPushButton("Add 3D text")
+        button1 = QPushButton("Add Text")
         button1.pressed.connect(self.add3dText)
         button2 = QPushButton("Add Image")
         button3 = QPushButton("Edit Layers")
@@ -51,6 +52,8 @@ class TextConverterMenu(QDialog):
         splitter.setSizes([int(self.window_width * 0.75), int(self.window_width * 0.25)])
 
         main_layout.addWidget(splitter)
+        
+        self.layersList = [] # list that stores all layers
 
         # Load the image
         pixmap = QPixmap(image_path)
@@ -69,19 +72,22 @@ class TextConverterMenu(QDialog):
     def add3dText(self):
         with Image.open(self.image_path) as im:
             self.setDisabled(True)
-            self.openTextDefMenu()
-            title, fontsize, depth = 'AAA', 200, 50 # TEMPORARY    
-            font = ImageFont.truetype("arial.ttf", fontsize)  # Specify your font file and size
+            textDefMenu = TextDefMenu()
+            textDefMenu.exec()
+            font, text, fontsize, threeD, color = textDefMenu.get()
+            depth = 15 # TODO: depth missing
             
+            fontPIL = ImageFont.truetype(font, fontsize) 
             draw = ImageDraw.Draw(im)
             text_position = (0, 0)  # Position of the text
             for i in range(depth):
                 text_color = (i, i, i)  # RGB color for the text
                 text_position = (0 + i, 10 + i)  # Position of the text
-                draw.text(text_position, title, font=font, fill=text_color)
-            text_color = (0, 255, 255)
-            draw.text(text_position, title, font=font, fill=text_color)
+                draw.text(text_position, text, font=fontPIL, fill=text_color)
+            #text_color = (0, 255, 255)
+            draw.text(text_position, text, font=fontPIL, fill=color)
             im.save("output.png")
+            self.image_path = "output.png"
             print("IMAGE SAVED")
             self.updatePreview()
             self.setDisabled(False)
@@ -96,10 +102,7 @@ class TextConverterMenu(QDialog):
         # Set the new scene to the graphicsView
         self.graphicsView.setScene(self.graphicsScene)
         
-    def openTextDefMenu(self):
-        pass
-        textDefMenu = TextDefMenu()
-        textDefMenu.exec()
+
         
         
         

@@ -172,3 +172,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 >>>>>>> aed2c2a26eb9f91610a924e9014310b6a7802dcf
+
+# Output image
+output.png

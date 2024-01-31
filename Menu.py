@@ -1,4 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QPushButton, QFileDialog, QTextEdit, QVBoxLayout
+from PyQt6.QtGui import QIcon
 from TextConverter import TextConverterMenu
 import os
 
@@ -8,6 +9,8 @@ class MainWindow(QWidget):
 
         self.window_width, self.window_height = 800, 500
         self.setMinimumSize(self.window_width, self.window_height)
+        self.setWindowTitle("Autodesign")
+        self.setWindowIcon(QIcon("Resources/Icons/ACM_logo.jpg"))  # Provide the path to your icon image
         
         layout = QVBoxLayout()
         self.setLayout(layout)
