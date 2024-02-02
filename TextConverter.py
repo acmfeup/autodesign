@@ -10,15 +10,15 @@ class TextConverterMenu(QDialog):
         
         self.image_path = image_path
 
+        # Set up window
         self.window_width, self.window_height = 800, 500
         self.setMinimumSize(self.window_width, self.window_height)
         self.setWindowTitle("Autodesign")
         self.setWindowIcon(QIcon("Resources/Icons/ACM_logo.jpg"))  # Provide the path to your icon image
  
         main_layout = QHBoxLayout(self)
-        
-        # Create a splitter to divide the window into two parts
-        splitter = QSplitter(Qt.Orientation.Horizontal)
+        splitter = QSplitter(Qt.Orientation.Horizontal)   # Splitter to divide the window into two parts
+
 
         # Create QGraphicsView and QGraphicsScene
         self.graphicsView = QGraphicsView(self)
@@ -43,6 +43,7 @@ class TextConverterMenu(QDialog):
         button3 = QPushButton("Edit Layers")
         button4 = QPushButton("Save Image")
 
+        # Add buttons to layout
         user_menu_layout.addWidget(button1)
         user_menu_layout.addWidget(button2)
         user_menu_layout.addWidget(button3)
@@ -53,12 +54,15 @@ class TextConverterMenu(QDialog):
 
         main_layout.addWidget(splitter)
         
-        self.layersList = [] # list that stores all layers
+        self.layersList = []
 
         # Load the image
         pixmap = QPixmap(image_path)
         item = QGraphicsPixmapItem(pixmap)
         self.graphicsScene.addItem(item)
+        
+
+        print(self.layersList)
         
         self.show()
         
@@ -74,23 +78,26 @@ class TextConverterMenu(QDialog):
             self.setDisabled(True)
             textDefMenu = TextDefMenu()
             textDefMenu.exec()
-            font, text, fontsize, threeD, color = textDefMenu.get()
-            depth = 15 # TODO: depth missing
+            font, text, fontsize, threeD, color, depth = textDefMenu.get()
+            #depth = 15 # TODO: depth missing
+            self.layersList.append([font, text, fontsize, depth, threeD, color])
             
             fontPIL = ImageFont.truetype(font, fontsize) 
             draw = ImageDraw.Draw(im)
             text_position = (0, 0)  # Position of the text
-            for i in range(depth):
-                text_color = (i, i, i)  # RGB color for the text
-                text_position = (0 + i, 10 + i)  # Position of the text
-                draw.text(text_position, text, font=fontPIL, fill=text_color)
-            #text_color = (0, 255, 255)
+            if threeD == True:
+                for i in range(depth):
+                    text_color = (i, i, i)  # RGB color for the text
+                    text_position = (0 + i, 10 + i)  # Position of the text
+                    draw.text(text_position, text, font=fontPIL, fill=text_color)
             draw.text(text_position, text, font=fontPIL, fill=color)
             im.save("output.png")
             self.image_path = "output.png"
-            print("IMAGE SAVED")
+            print("IMAGE SAVED") # TODO: remove
             self.updatePreview()
             self.setDisabled(False)
+            print(self.layersList)
+
         
     def updatePreview(self):
         # Update QGraphicsScene with the modified image
