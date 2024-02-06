@@ -58,9 +58,9 @@ class TextConverterMenu(QDialog):
         self.layersList = []
 
         # Load the image
-        pixmap = QPixmap(image_path)
-        item = QGraphicsPixmapItem(pixmap)
-        self.graphicsScene.addItem(item)
+        self.pixmap = QPixmap(image_path)
+        self.item = QGraphicsPixmapItem(self.pixmap)
+        self.graphicsScene.addItem(self.item)
                 
         self.show()
         
@@ -75,20 +75,19 @@ class TextConverterMenu(QDialog):
         textDefMenu = TextDefMenu()
         textDefMenu.exec()
         font, text, fontsize, threeD, color, depth, x, y = textDefMenu.conclude()
-        self.drawText(font, text, fontsize, threeD, color, depth, x, y)
+        layer_item = [font, text, fontsize, threeD, color, depth, x, y]
+        self.addLayer(layer_item, layer_item[1])  # TODO: fix
         self.setDisabled(False)
         
     def updatePreview(self):
-        # Update QGraphicsScene with the modified image
-        pixmap = QPixmap(self.image_path)
-        item = QGraphicsPixmapItem(pixmap)
-        self.graphicsScene.clear()  # Clear existing items in the scene
-        self.graphicsScene.addItem(item)
-
-        # Set the new scene to the graphicsView
-        self.graphicsView.setScene(self.graphicsScene)
+        # Remove all items from the scene
+        for item in self.graphicsScene.items():
+            self.graphicsScene.removeItem(item)
         
-        # Update layers 
+        self.drawText()
+        self.pixmap = QPixmap('output.png')
+        self.item.setPixmap(self.pixmap)
+        self.graphicsScene.addItem(self.item)
         self.layersListWidget.clear()
         for layer_item in self.layersList:
             self.layersListWidget.addItem(layer_item[1])  # Only add Text to layers view
@@ -112,24 +111,36 @@ class TextConverterMenu(QDialog):
         self.layersList.pop(layerIndex)
         self.updatePreview()
         
-    def drawText(self, font, text, fontsize, threeD, color, depth, x, y):
-        layer_item = [font, text, fontsize, threeD, color, depth, x, y]
-        self.addLayer(layer_item, text)
-        with Image.open(self.image_path) as im:
-            fontPIL = ImageFont.truetype(font, fontsize) 
-            draw = ImageDraw.Draw(im)
-            text_position = (x, y)  # Position of the text
-            if threeD == True:
-                for i in range(depth):
-                    text_color = (i, i, i)  # RGB color for the text
-                    text_position = (x + i, y + i)  # Position of the text
-                    draw.text(text_position, text, font=fontPIL, fill=text_color)
-            draw.text(text_position, text, font=fontPIL, fill=color)
-            im.save("output.png") # TODO: change output path and name
-            self.image_path = "output.png"
-            self.updatePreview()
+    def drawText(self):
+        path = self.image_path
+        for layer_item in self.layersList:
+            # TODO: Create Layer class
+            font = layer_item[0]
+            text = layer_item[1]
+            fontsize = layer_item[2]
+            threeD = layer_item[3]
+            color = layer_item[4]
+            depth = layer_item[5]
+            x = layer_item[6]
+            y = layer_item[7]
+            with Image.open(path) as im:
+                fontPIL = ImageFont.truetype(font, fontsize) 
+                draw = ImageDraw.Draw(im)
+                text_position = (x, y)  # Position of the text
+                if threeD == True:
+                    for i in range(depth):
+                        text_color = (i, i, i)  # RGB color for the text
+                        text_position = (x + i, y + i)  # Position of the text
+                        draw.text(text_position, text, font=fontPIL, fill=text_color)
+                draw.text(text_position, text, font=fontPIL, fill=color)
+                #self.image_path = "output.png"
+                im.save("output.png") # TODO: change output path and name
+            im.close()
+            path = 'output.png'
 
+        
     def addLayer(self, layer_item, layer_name):
         self.layersList.append(layer_item)
         self.layersListWidget.addItem(layer_name)
+        self.updatePreview()
         

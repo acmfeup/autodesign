@@ -129,5 +129,5 @@ class TextDefMenu(QDialog):
         self.color = layer[4]
         qcolor = QColor(*self.color)
         self.colorButton.setStyleSheet(f"background-color: {qcolor.name()}; color: white;")
-        self.x = layer[6]
-        self.y = layer[7]
+        self.xSpinbox.setValue(layer[6])
+        self.ySpinbox.setValue(layer[7])
