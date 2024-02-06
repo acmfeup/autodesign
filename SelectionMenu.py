@@ -1,7 +1,5 @@
 from PyQt6.QtWidgets import QPushButton, QDialog, QLineEdit, QComboBox, QLabel, QGridLayout, QColorDialog, QCheckBox, QSpinBox
 from PyQt6.QtGui import QColor, QIcon
-from PyQt6.QtCore import Qt
-from PIL import ImageFont
 
 class TextDefMenu(QDialog):
     def __init__(self):
@@ -15,8 +13,7 @@ class TextDefMenu(QDialog):
         self.color = (255, 255, 255)
         self.x = 0
         self.y = 0
-        self.updateUserChoices()
-        self.userChoices = (self.font, self.text, self.fontsize, self.threeD, self.color)   # tuple of user choices to be applied
+        self.userChoices = [self.font, self.text, self.fontsize, self.threeD, self.color]   # user choices to be applied
         
         # Window
         self.window_width, self.window_height = 250, 300
@@ -27,6 +24,8 @@ class TextDefMenu(QDialog):
         # Create Buttons, ComboBoxes,...
         self.fontLabel = QLabel('Font')  
         self.fontBox = QComboBox()        # Combobox for font
+        self.fontBox.addItem('arial.ttf')
+        self.fontBox.addItem('georgia.ttf')
         self.textColorLabel = QLabel('Text Color')  
         self.colorLabel = QLabel('Color')
         self.colorButton = QPushButton()   # Button for picking color
@@ -50,7 +49,7 @@ class TextDefMenu(QDialog):
         self.threeDCheckBox.stateChanged.connect(self.toggleDepthSpinbox)
         self.threeDCheckBox.setChecked(False)  # Set initial state to unchecked
         self.applyButton = QPushButton('Apply')   # Button to confirm all textboxes
-        self.applyButton.clicked.connect(self.get)
+        self.applyButton.clicked.connect(self.conclude)
         self.xLabel = QLabel('x')  
         self.xSpinbox = QSpinBox()         # Spinbox for size
         self.xSpinbox.setRange(1, 1000)   # TODO: adjust range to an appropriate value
@@ -98,24 +97,22 @@ class TextDefMenu(QDialog):
         print(self.color)
         if pickedColor.isValid():
             self.colorButton.setStyleSheet(f"background-color: {pickedColor.name()}; color: white;")
-    
-    def updateUserChoices(self):
-        self.userChoices = (self.font, self.text, self.fontsize, self.threeD, self.color, self.depth, self.x, self.y)   # tuple of user choices to be applied
 
-    def get(self):
-        #self.font = self.fontBox.currentText()  # Get selected font from ComboBox
+    def updateChoices(self):
+        self.font = self.fontBox.currentText()  # Get selected font from ComboBox
         self.text = self.titleTextbox.text()    # Get text from QLineEdit
         self.fontsize = self.sizeSpinbox.value()  # Get value from SpinBox
         self.threeD = self.threeDCheckBox.isChecked()  # Get whether CheckBox is checked
         self.depth = self.depthSpinbox.value()
         self.x = self.xSpinbox.value()
         self.y = self.ySpinbox.value()
-        
-        self.updateUserChoices()
+        self.userChoices = [self.font, self.text, self.fontsize, self.threeD, self.color, self.depth, self.x, self.y]   # tuple of user choices to be applied
+
+    def conclude(self):
+        self.updateChoices()
         self.close()
         return self.userChoices
     
-
     # Define the method to toggle the enabled state of the depthSpinbox
     def toggleDepthSpinbox(self):
         if self.threeDCheckBox.isChecked():
@@ -124,11 +121,13 @@ class TextDefMenu(QDialog):
             self.depthSpinbox.setEnabled(False)
             
     def loadLayer(self, layer):
-        #self.fontBox.setText(layer[0]) # TODO: fix
+        self.fontBox.setCurrentText(layer[0]) # TODO: fix
         self.titleTextbox.setText(layer[1])
         self.sizeSpinbox.setValue(layer[2])
-        self.depthSpinbox.setValue(layer[3])
-        self.threeDCheckBox.setChecked(layer[4])
-        #self.colorButton.setStyleSheet(f"background-color: {pickedColor.name()}; color: white;")
-        return layer
-        
+        self.depthSpinbox.setValue(layer[5])
+        self.threeDCheckBox.setChecked(layer[3])
+        self.color = layer[4]
+        qcolor = QColor(*self.color)
+        self.colorButton.setStyleSheet(f"background-color: {qcolor.name()}; color: white;")
+        self.x = layer[6]
+        self.y = layer[7]

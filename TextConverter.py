@@ -1,5 +1,5 @@
 from SelectionMenu import TextDefMenu 
-from PyQt6.QtWidgets import QDialog, QGraphicsView, QGraphicsScene, QVBoxLayout, QGraphicsPixmapItem, QSizePolicy, QWidget, QPushButton, QHBoxLayout, QSplitter, QListWidget, QListWidgetItem
+from PyQt6.QtWidgets import QDialog, QGraphicsView, QGraphicsScene, QVBoxLayout, QGraphicsPixmapItem, QSizePolicy, QWidget, QPushButton, QHBoxLayout, QSplitter, QListWidget
 from PyQt6.QtGui import QPixmap, QIcon
 from PyQt6.QtCore import Qt
 from PIL import Image, ImageDraw, ImageFont
@@ -18,7 +18,6 @@ class TextConverterMenu(QDialog):
  
         main_layout = QHBoxLayout(self)
         splitter = QSplitter(Qt.Orientation.Horizontal)   # Splitter to divide the window into two parts
-
 
         # Create QGraphicsView and QGraphicsScene
         self.graphicsView = QGraphicsView(self)
@@ -62,50 +61,26 @@ class TextConverterMenu(QDialog):
         pixmap = QPixmap(image_path)
         item = QGraphicsPixmapItem(pixmap)
         self.graphicsScene.addItem(item)
-        
-
-        print(self.layersList)
-        
+                
         self.show()
         
     def zoom(self, event):
         factor = 1.025
         if event.angleDelta().y() < 0:
             factor = 1.0 / factor
-
         self.graphicsView.setTransform(self.graphicsView.transform().scale(factor, factor))
         
     def add3dText(self):
-        with Image.open(self.image_path) as im:
-            self.setDisabled(True)
-            textDefMenu = TextDefMenu()
-            textDefMenu.exec()
-            font, text, fontsize, threeD, color, depth, x, y = textDefMenu.get()
-            print(x, y)
-            layer_item = [font, text, fontsize, depth, threeD, color]
-            self.layersList.append(layer_item)
-            self.layersListWidget.addItem(text)
-            
-            fontPIL = ImageFont.truetype(font, fontsize) 
-            draw = ImageDraw.Draw(im)
-            text_position = (x, y)  # Position of the text
-            if threeD == True:
-                for i in range(depth):
-                    text_color = (i, i, i)  # RGB color for the text
-                    text_position = (x + i, y + i)  # Position of the text
-                    draw.text(text_position, text, font=fontPIL, fill=text_color)
-            draw.text(text_position, text, font=fontPIL, fill=color)
-            im.save("output.png")
-            self.image_path = "output.png"
-            print("IMAGE SAVED") # TODO: remove
-            self.updatePreview()
-            self.setDisabled(False)
-            print(self.layersList)
-
+        self.setDisabled(True)
+        textDefMenu = TextDefMenu()
+        textDefMenu.exec()
+        font, text, fontsize, threeD, color, depth, x, y = textDefMenu.conclude()
+        self.drawText(font, text, fontsize, threeD, color, depth, x, y)
+        self.setDisabled(False)
         
     def updatePreview(self):
         # Update QGraphicsScene with the modified image
-        pixmap = QPixmap("output.png")
+        pixmap = QPixmap(self.image_path)
         item = QGraphicsPixmapItem(pixmap)
         self.graphicsScene.clear()  # Clear existing items in the scene
         self.graphicsScene.addItem(item)
@@ -116,20 +91,45 @@ class TextConverterMenu(QDialog):
         # Update layers 
         self.layersListWidget.clear()
         for layer_item in self.layersList:
-            self.layersListWidget.addItem(layer_item[1])  
+            self.layersListWidget.addItem(layer_item[1])  # Only add Text to layers view
         
         
     def onLayersItemClick(self):
+        print('layers list before:', self.layersList)
+        self.setDisabled(True)
         selected_index = self.layersListWidget.currentRow()
         layerEditor = TextDefMenu()
-        self.layersList[selected_index] = layerEditor.loadLayer(self.layersList[selected_index])
+        layerEditor.loadLayer(self.layersList[selected_index])
         layerEditor.exec()
+        subLayer = layerEditor.conclude()   # Layer that will substitute the old one
+        self.layersList[selected_index] = subLayer
+        print('layers list after:', self.layersList)
+        self.updatePreview()
+        self.setDisabled(False)
         #self.deleteLayer(0)  # DEBUG
         
     def deleteLayer(self, layerIndex):
         self.layersList.pop(layerIndex)
         self.updatePreview()
         
+    def drawText(self, font, text, fontsize, threeD, color, depth, x, y):
+        layer_item = [font, text, fontsize, threeD, color, depth, x, y]
+        self.addLayer(layer_item, text)
+        with Image.open(self.image_path) as im:
+            fontPIL = ImageFont.truetype(font, fontsize) 
+            draw = ImageDraw.Draw(im)
+            text_position = (x, y)  # Position of the text
+            if threeD == True:
+                for i in range(depth):
+                    text_color = (i, i, i)  # RGB color for the text
+                    text_position = (x + i, y + i)  # Position of the text
+                    draw.text(text_position, text, font=fontPIL, fill=text_color)
+            draw.text(text_position, text, font=fontPIL, fill=color)
+            im.save("output.png") # TODO: change output path and name
+            self.image_path = "output.png"
+            self.updatePreview()
 
-        
+    def addLayer(self, layer_item, layer_name):
+        self.layersList.append(layer_item)
+        self.layersListWidget.addItem(layer_name)
         
