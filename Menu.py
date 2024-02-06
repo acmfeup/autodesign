@@ -1,30 +1,47 @@
-from PyQt6.QtWidgets import QWidget, QPushButton, QFileDialog, QTextEdit, QVBoxLayout
-from PyQt6.QtGui import QIcon
+from PyQt6.QtWidgets import QWidget, QPushButton, QFileDialog, QVBoxLayout, QLabel
+from PyQt6.QtGui import QIcon, QFont
 from TextConverter import TextConverterMenu
+from PyQt6.QtCore import Qt
 import os
 
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.window_width, self.window_height = 800, 500
+        self.window_width, self.window_height = 500, 300
         self.setMinimumSize(self.window_width, self.window_height)
         self.setWindowTitle("Autodesign")
         self.setWindowIcon(QIcon("Resources/Icons/ACM_logo.jpg"))  # Provide the path to your icon image
         
-        layout = QVBoxLayout()
-        self.setLayout(layout)
-
-        button = QPushButton("Import an image")
-        button.pressed.connect(self.importImage)
-        layout.addWidget(button)
+        buttonWidth = 200
+        buttonHeight = 50
+        buttonFont = 'Tahoma'
+        titleFont = buttonFont
+        buttonFontSize = 10
+        buttonSpacing = 15
         
-        button2 = QPushButton("Create text without an image")
-        #button2.pressed.connect(self.openTextConverter())
-        layout.addWidget(button2)
+        # Create widgets
+        self.titleLabel = QLabel('Autodesign')
+        self.titleLabel.setFont(QFont(titleFont, 50))
+        self.importImageButton = QPushButton("Import an image")
+        self.importImageButton.setFixedSize(buttonWidth, buttonHeight)
+        self.importImageButton.setFont(QFont(buttonFont, buttonFontSize))
+        self.importImageButton.pressed.connect(self.importImage)        
+        self.noImageButton = QPushButton("Create text without an image")        
+        self.noImageButton.setFixedSize(buttonWidth, buttonHeight)
+        self.noImageButton.setFont(QFont(buttonFont, buttonFontSize))
+        
+        # Create Layout
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.titleLabel, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.layout.addSpacing(30) 
+        self.layout.addWidget(self.importImageButton, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.layout.addSpacing(buttonSpacing) 
+        self.layout.addWidget(self.noImageButton, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.textbox = QTextEdit()
-        layout.addWidget(self.textbox)
+        # Set Layout
+        self.setLayout(self.layout)
+        self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         
         self.show()
         
@@ -39,11 +56,9 @@ class MainWindow(QWidget):
         )
         
         if response[0]:  # Check if a valid file was selected
-            self.textbox.setText(str(response))
             self.openTextConverter(response[0])
         else:
             print("Import canceled or invalid file selected.")
-            self.textbox.setText("Invalid file")
         
         
     def openTextConverter(self, image_path):

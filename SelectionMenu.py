@@ -13,6 +13,8 @@ class TextDefMenu(QDialog):
         self.fontsize = 100
         self.threeD = False
         self.color = (255, 255, 255)
+        self.x = 0
+        self.y = 0
         self.updateUserChoices()
         self.userChoices = (self.font, self.text, self.fontsize, self.threeD, self.color)   # tuple of user choices to be applied
         
@@ -35,18 +37,28 @@ class TextDefMenu(QDialog):
         self.fontSizeLabel = QLabel('Font Size')  
         self.sizeSpinbox = QSpinBox()         # Spinbox for size
         self.sizeSpinbox.setRange(1, 1000)   # TODO: adjust range to an appropriate value
+        self.sizeSpinbox.setValue(50)
         self.sizeSpinbox.setFixedWidth(150)
         self.depthLabel = QLabel('3D Depth')  
         self.depthSpinbox = QSpinBox()         # Spinbox for depth
         self.depthSpinbox.setRange(1, 1000)   # TODO: adjust range to an appropriate value
         self.depthSpinbox.setFixedWidth(150)  
         self.depthSpinbox.setEnabled(False)  
+        self.depthSpinbox.setValue(10)
         self.threeDLabel = QLabel('3D')  
         self.threeDCheckBox = QCheckBox() # Checkbox for 3D Text
         self.threeDCheckBox.stateChanged.connect(self.toggleDepthSpinbox)
         self.threeDCheckBox.setChecked(False)  # Set initial state to unchecked
         self.applyButton = QPushButton('Apply')   # Button to confirm all textboxes
         self.applyButton.clicked.connect(self.get)
+        self.xLabel = QLabel('x')  
+        self.xSpinbox = QSpinBox()         # Spinbox for size
+        self.xSpinbox.setRange(1, 1000)   # TODO: adjust range to an appropriate value
+        self.xSpinbox.setFixedWidth(150)
+        self.yLabel = QLabel('y')  
+        self.ySpinbox = QSpinBox()         # Spinbox for size
+        self.ySpinbox.setRange(1, 1000)   # TODO: adjust range to an appropriate value
+        self.ySpinbox.setFixedWidth(150)
           
         # Create grid layout
         self.layout = QGridLayout()
@@ -62,7 +74,11 @@ class TextDefMenu(QDialog):
         self.layout.addWidget(self.depthSpinbox, 3, 3)
         self.layout.addWidget(self.colorLabel, 4, 0)
         self.layout.addWidget(self.colorButton, 4, 1)
-        self.layout.addWidget(self.applyButton, 5, 0, 1, 2)  # span two columns for the button
+        self.layout.addWidget(self.xLabel, 5, 0)
+        self.layout.addWidget(self.xSpinbox, 5, 1)
+        self.layout.addWidget(self.yLabel, 5, 2)
+        self.layout.addWidget(self.ySpinbox, 5, 3)
+        self.layout.addWidget(self.applyButton, 6, 0, 1, 2)  # span two columns for the button
 
         
         # Set column stretch to push items to the top
@@ -84,7 +100,7 @@ class TextDefMenu(QDialog):
             self.colorButton.setStyleSheet(f"background-color: {pickedColor.name()}; color: white;")
     
     def updateUserChoices(self):
-        self.userChoices = (self.font, self.text, self.fontsize, self.threeD, self.color, self.depth)   # tuple of user choices to be applied
+        self.userChoices = (self.font, self.text, self.fontsize, self.threeD, self.color, self.depth, self.x, self.y)   # tuple of user choices to be applied
 
     def get(self):
         #self.font = self.fontBox.currentText()  # Get selected font from ComboBox
@@ -92,6 +108,8 @@ class TextDefMenu(QDialog):
         self.fontsize = self.sizeSpinbox.value()  # Get value from SpinBox
         self.threeD = self.threeDCheckBox.isChecked()  # Get whether CheckBox is checked
         self.depth = self.depthSpinbox.value()
+        self.x = self.xSpinbox.value()
+        self.y = self.ySpinbox.value()
         
         self.updateUserChoices()
         self.close()
@@ -99,9 +117,18 @@ class TextDefMenu(QDialog):
     
 
     # Define the method to toggle the enabled state of the depthSpinbox
-    def toggleDepthSpinbox(self, state):
+    def toggleDepthSpinbox(self):
         if self.threeDCheckBox.isChecked():
             self.depthSpinbox.setEnabled(True)
         else:
             self.depthSpinbox.setEnabled(False)
+            
+    def loadLayer(self, layer):
+        #self.fontBox.setText(layer[0]) # TODO: fix
+        self.titleTextbox.setText(layer[1])
+        self.sizeSpinbox.setValue(layer[2])
+        self.depthSpinbox.setValue(layer[3])
+        self.threeDCheckBox.setChecked(layer[4])
+        #self.colorButton.setStyleSheet(f"background-color: {pickedColor.name()}; color: white;")
+        return layer
         
