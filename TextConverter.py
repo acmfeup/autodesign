@@ -1,8 +1,9 @@
 from SelectionMenu import TextDefMenu 
-from PyQt6.QtWidgets import QDialog, QGraphicsView, QGraphicsScene, QVBoxLayout, QGraphicsPixmapItem, QSizePolicy, QWidget, QPushButton, QHBoxLayout, QSplitter, QListWidget
+from PyQt6.QtWidgets import QDialog, QGraphicsView, QGraphicsScene, QVBoxLayout, QGraphicsPixmapItem, QSizePolicy, QWidget, QPushButton, QHBoxLayout, QSplitter, QListWidget, QMessageBox
 from PyQt6.QtGui import QPixmap, QIcon
 from PyQt6.QtCore import Qt
 from PIL import Image, ImageDraw, ImageFont
+import sys
 
 class TextConverterMenu(QDialog):
     def __init__(self, image_path, parent=None):
@@ -94,7 +95,7 @@ class TextConverterMenu(QDialog):
         
         
     def onLayersItemClick(self):
-        print('layers list before:', self.layersList)
+        #print('layers list before:', self.layersList)  # DEBUG
         self.setDisabled(True)
         selected_index = self.layersListWidget.currentRow()
         layerEditor = TextDefMenu()
@@ -102,7 +103,7 @@ class TextConverterMenu(QDialog):
         layerEditor.exec()
         subLayer = layerEditor.conclude()   # Layer that will substitute the old one
         self.layersList[selected_index] = subLayer
-        print('layers list after:', self.layersList)
+        #print('layers list after:', self.layersList)  # DEBUG
         self.updatePreview()
         self.setDisabled(False)
         #self.deleteLayer(0)  # DEBUG
@@ -124,7 +125,7 @@ class TextConverterMenu(QDialog):
             x = layer_item[6]
             y = layer_item[7]
             with Image.open(path) as im:
-                fontPIL = ImageFont.truetype(font, fontsize) 
+                fontPIL = ImageFont.truetype('./Custom fonts/'+ font, fontsize)
                 draw = ImageDraw.Draw(im)
                 text_position = (x, y)  # Position of the text
                 if threeD == True:
@@ -143,4 +144,18 @@ class TextConverterMenu(QDialog):
         self.layersList.append(layer_item)
         self.layersListWidget.addItem(layer_name)
         self.updatePreview()
+        
+    def closeEvent(self, event):
+        close = QMessageBox()
+        close.setWindowTitle("Close program")
+        close.setWindowIcon(QIcon("Resources/Icons/ACM_logo.jpg"))  # Set the window icon
+        close.setText("Are you sure?")
+        close.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel)
+        close = close.exec()
+
+        if close == QMessageBox.StandardButton.Yes:
+            event.accept()
+            sys.exit()
+        else:
+            event.ignore()
         

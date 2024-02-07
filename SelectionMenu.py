@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import QPushButton, QDialog, QLineEdit, QComboBox, QLabel, QGridLayout, QColorDialog, QCheckBox, QSpinBox
 from PyQt6.QtGui import QColor, QIcon
+import os
 
 class TextDefMenu(QDialog):
     def __init__(self):
@@ -24,8 +25,7 @@ class TextDefMenu(QDialog):
         # Create Buttons, ComboBoxes,...
         self.fontLabel = QLabel('Font')  
         self.fontBox = QComboBox()        # Combobox for font
-        self.fontBox.addItem('arial.ttf')
-        self.fontBox.addItem('georgia.ttf')
+        self.addFontsToList()
         self.textColorLabel = QLabel('Text Color')  
         self.colorLabel = QLabel('Color')
         self.colorButton = QPushButton()   # Button for picking color
@@ -131,3 +131,15 @@ class TextDefMenu(QDialog):
         self.colorButton.setStyleSheet(f"background-color: {qcolor.name()}; color: white;")
         self.xSpinbox.setValue(layer[6])
         self.ySpinbox.setValue(layer[7])
+        
+    def addFontsToList(self):
+        self.fontBox.addItem('arial.ttf')
+        self.fontBox.addItem('georgia.ttf')
+        
+        for file in os.listdir("Custom fonts"):
+            filename = os.fsdecode(file)
+            if filename.endswith(".ttf"): 
+                print('Font found:', filename)
+                self.fontBox.addItem(filename)
+            else:
+                continue
