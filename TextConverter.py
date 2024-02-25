@@ -4,6 +4,7 @@ from PyQt6.QtGui import QPixmap, QIcon
 from PyQt6.QtCore import Qt
 from PIL import Image, ImageDraw, ImageFont
 import sys
+import textwrap
 
 class TextConverterMenu(QDialog):
     def __init__(self, image_path, parent=None):
@@ -124,6 +125,7 @@ class TextConverterMenu(QDialog):
             depth = layer_item[5]
             x = layer_item[6]
             y = layer_item[7]
+            wrapped_text = textwrap.fill(text, width=20)  # Adjust the width as needed
             with Image.open(path) as im:
                 fontPIL = ImageFont.truetype('./Custom fonts/'+ font, fontsize)
                 draw = ImageDraw.Draw(im)
@@ -132,8 +134,8 @@ class TextConverterMenu(QDialog):
                     for i in range(depth):
                         text_color = (i, i, i)  # RGB color for the text
                         text_position = (x + i, y + i)  # Position of the text
-                        draw.text(text_position, text, font=fontPIL, fill=text_color)
-                draw.text(text_position, text, font=fontPIL, fill=color)
+                        draw.text(text_position, wrapped_text, font=fontPIL, fill=text_color)
+                draw.text(text_position, wrapped_text, font=fontPIL, fill=color)
                 #self.image_path = "output.png"
                 im.save("output.png") # TODO: change output path and name
             im.close()
