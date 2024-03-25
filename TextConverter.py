@@ -1,4 +1,5 @@
 from SelectionMenu import TextDefMenu 
+from LayerMenu import LayerMenu
 from PyQt6.QtWidgets import QDialog, QGraphicsView, QGraphicsScene, QVBoxLayout, QGraphicsPixmapItem, QSizePolicy, QWidget, QPushButton, QHBoxLayout, QSplitter, QListWidget, QMessageBox
 from PyQt6.QtGui import QPixmap, QIcon
 from PyQt6.QtCore import Qt
@@ -82,6 +83,8 @@ class TextConverterMenu(QDialog):
         self.setDisabled(False)
         
     def updatePreview(self):
+        print("current layerslist: ", self.layersList)
+        
         # Remove all items from the scene
         for item in self.graphicsScene.items():
             self.graphicsScene.removeItem(item)
@@ -99,22 +102,29 @@ class TextConverterMenu(QDialog):
         #print('layers list before:', self.layersList)  # DEBUG
         self.setDisabled(True)
         selected_index = self.layersListWidget.currentRow()
-        layerEditor = TextDefMenu()
+        layerEditor = LayerMenu()
         layerEditor.loadLayer(self.layersList[selected_index])
         layerEditor.exec()
         subLayer = layerEditor.conclude()   # Layer that will substitute the old one
+        #print(self.layersList[selected_index])
         self.layersList[selected_index] = subLayer
+        if (subLayer[1] == ''): # Empty layers should be ignored
+            self.layersList.remove(subLayer)
         #print('layers list after:', self.layersList)  # DEBUG
         self.updatePreview()
         self.setDisabled(False)
-        #self.deleteLayer(0)  # DEBUG
         
     def deleteLayer(self, layerIndex):
         self.layersList.pop(layerIndex)
         self.updatePreview()
         
     def drawText(self):
+        output_path = "output.png"
         path = self.image_path
+        if (self.layersList == []):
+            with Image.open(path) as im:
+                im.save(output_path)
+            im.close()
         for layer_item in self.layersList:
             # TODO: Create Layer class
             font = layer_item[0]
@@ -136,10 +146,9 @@ class TextConverterMenu(QDialog):
                         text_position = (x + i, y + i)  # Position of the text
                         draw.text(text_position, wrapped_text, font=fontPIL, fill=text_color)
                 draw.text(text_position, wrapped_text, font=fontPIL, fill=color)
-                #self.image_path = "output.png"
-                im.save("output.png") # TODO: change output path and name
+                im.save(output_path) # TODO: change output path and name
             im.close()
-            path = 'output.png'
+            path = output_path
 
         
     def addLayer(self, layer_item, layer_name):
