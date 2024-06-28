@@ -1,10 +1,11 @@
 from SelectionMenu import TextDefMenu 
 from LayerMenu import LayerMenu
-from PyQt6.QtWidgets import QDialog, QGraphicsView, QGraphicsScene, QVBoxLayout, QGraphicsPixmapItem, QSizePolicy, QWidget, QPushButton, QHBoxLayout, QSplitter, QListWidget, QMessageBox
-from PyQt6.QtGui import QPixmap, QIcon
+from PyQt6.QtWidgets import QDialog, QGraphicsView, QGraphicsScene, QVBoxLayout, QGraphicsPixmapItem, QFileDialog, QSizePolicy, QWidget, QPushButton, QHBoxLayout, QSplitter, QListWidget, QMessageBox
+from PyQt6.QtGui import QPixmap, QIcon, QKeyEvent, QPainter
 from PyQt6.QtCore import Qt
 from PIL import Image, ImageDraw, ImageFont
 import sys
+import os
 import textwrap
 
 class TextConverterMenu(QDialog):
@@ -24,6 +25,8 @@ class TextConverterMenu(QDialog):
 
         # Create QGraphicsView and QGraphicsScene
         self.graphicsView = QGraphicsView(self)
+        self.graphicsView.setRenderHint(QPainter.RenderHint.Antialiasing)
+        self.graphicsView.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
         self.graphicsScene = QGraphicsScene(self)
         self.graphicsView.setScene(self.graphicsScene)
         self.graphicsView.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -42,6 +45,7 @@ class TextConverterMenu(QDialog):
         button1 = QPushButton("Add Text")
         button1.pressed.connect(self.add3dText)
         button2 = QPushButton("Add Image")
+        button2.pressed.connect(self.addOverlayImage)
         button4 = QPushButton("Save Image")
         self.layersListWidget = QListWidget()
         self.layersListWidget.setDragEnabled(True)
@@ -65,6 +69,7 @@ class TextConverterMenu(QDialog):
         self.item = QGraphicsPixmapItem(self.pixmap)
         self.graphicsScene.addItem(self.item)
                 
+        self.maximized = False
         self.show()
         
     def zoom(self, event):
@@ -79,8 +84,26 @@ class TextConverterMenu(QDialog):
         textDefMenu.exec()
         font, text, fontsize, threeD, color, depth, x, y = textDefMenu.conclude()
         layer_item = [font, text, fontsize, threeD, color, depth, x, y]
-        self.addLayer(layer_item, layer_item[1])  # TODO: fix
+        self.addLayer(layer_item, layer_item[1]) 
         self.setDisabled(False)
+        
+    def addOverlayImage(self):
+        file_filter = 'Image File (*.png *.jpg)'
+        response = QFileDialog.getOpenFileName(
+            parent = self,
+            caption = 'Select a file',
+            directory = os.getcwd(),
+            filter = file_filter,
+            initialFilter = 'Image File (*.png *.jpg)'
+        )
+        if response[0]:  # Check if a valid file was selected
+            imageLayer = ["isImg", response[0]]
+            self.addLayer(imageLayer, "Img")
+            self.drawOverlayImage(response[0])
+        else:
+            print("Import canceled or invalid file selected.")
+        
+        
         
     def updatePreview(self):
         print("current layerslist: ", self.layersList)
@@ -118,15 +141,22 @@ class TextConverterMenu(QDialog):
         self.layersList.pop(layerIndex)
         self.updatePreview()
         
+    def drawImage(self, layer_item):
+        self.drawOverlayImage(layer_item[1])
+        # TODO: ...
+        
+    # TODO: Call this function drawLayer instead of drawImage (loop on each layer and determine which function to call)
     def drawText(self):
-        output_path = "output.png"
+        output_path = "output.png" # TODO: make this an option (to choose output file name)
         path = self.image_path
         if (self.layersList == []):
             with Image.open(path) as im:
                 im.save(output_path)
             im.close()
         for layer_item in self.layersList:
-            # TODO: Create Layer class
+            if layer_item[0] == "isImg":
+                self.drawImage(layer_item)
+                continue
             font = layer_item[0]
             text = layer_item[1]
             fontsize = layer_item[2]
@@ -146,11 +176,16 @@ class TextConverterMenu(QDialog):
                         text_position = (x + i, y + i)  # Position of the text
                         draw.text(text_position, wrapped_text, font=fontPIL, fill=text_color)
                 draw.text(text_position, wrapped_text, font=fontPIL, fill=color)
-                im.save(output_path) # TODO: change output path and name
+                im.save(output_path) 
             im.close()
             path = output_path
 
-        
+    def drawOverlayImage(self, img_path):
+        overlay_pixmap = QPixmap(img_path)
+        overlay_item = QGraphicsPixmapItem(overlay_pixmap)
+        overlay_item.setOffset(0, 0)
+        self.graphicsScene.addItem(overlay_item)    
+    
     def addLayer(self, layer_item, layer_name):
         self.layersList.append(layer_item)
         self.layersListWidget.addItem(layer_name)
@@ -170,3 +205,15 @@ class TextConverterMenu(QDialog):
         else:
             event.ignore()
         
+    # TODO: Tell user to press F for full screen
+    def keyPressEvent(self,event: QKeyEvent):
+        k = event.key()
+        txt = event.text()
+        alt_modifier = (event.modifiers() == Qt.KeyboardModifier.AltModifier)
+        if (txt == "f"):
+            if (not self.maximized):
+                self.maximized = True
+                self.showMaximized()
+            else:
+                self.maximized = False
+                self.showNormal()
