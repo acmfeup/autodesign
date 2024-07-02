@@ -50,7 +50,7 @@ class ImgDefMenu(QDialog):
     def updateChoices(self):
         self.x = self.xSpinbox.value()
         self.y = self.ySpinbox.value()
-        self.userChoices = [self.x, self.y]   # tuple of user choices to be applied
+        self.userChoices = [self.userChoices[0], self.userChoices[1], self.x, self.y]   # tuple of user choices to be applied
 
     def conclude(self):
         self.updateChoices()
@@ -58,6 +58,7 @@ class ImgDefMenu(QDialog):
         return self.userChoices
             
     def loadLayer(self, layer):
+        self.userChoices = layer
         self.xSpinbox.setValue(layer[2])
         self.ySpinbox.setValue(layer[3])
         

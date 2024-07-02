@@ -51,6 +51,8 @@ class TextConverterMenu(QDialog):
         button4.pressed.connect(self.savePreview)
         self.layersListWidget = QListWidget()
         self.layersListWidget.setDragEnabled(True)
+        self.layersListWidget.setDragDropMode(QListWidget.DragDropMode.InternalMove)
+        self.layersListWidget.model().rowsMoved.connect(self.updateLayerOrder)
         self.layersListWidget.itemDoubleClicked.connect(self.onLayersItemClick)
 
         # Add buttons to layout
@@ -71,9 +73,25 @@ class TextConverterMenu(QDialog):
         self.item = QGraphicsPixmapItem(self.pixmap)
         self.graphicsScene.addItem(self.item)
         self.savePreview()
+        base_layer = ["isImg", self.image_path, 0, 0] 
+        self.addLayer(base_layer, "Base Image")
                 
         self.maximized = False
         self.show()
+        
+    def updateLayerOrder(self):
+         # Create a new ordered list based on the QListWidget order
+        new_layers_list = []
+        print("Before: ", self.layersList)
+        for i in range(self.layersListWidget.count()):
+            item_name = self.layersListWidget.item(i).text()
+            for layer in self.layersList:
+                if layer[1] == item_name:
+                    new_layers_list.append(layer)
+                    break
+        self.layersList = new_layers_list
+        print("After: ", self.layersList)
+        self.updatePreview()
         
     def zoom(self, event):
         factor = 1.025
@@ -92,10 +110,9 @@ class TextConverterMenu(QDialog):
     
     def showImageEditWindow(self, path):
         self.setDisabled(True)
-        textDefMenu = ImgDefMenu()
-        textDefMenu.exec()
-        x, y = textDefMenu.conclude()
-        layer_item = ["isImg", path, x, y]
+        imgDefMenu = ImgDefMenu()
+        imgDefMenu.exec()
+        layer_item = imgDefMenu.conclude()
         self.addLayer(layer_item, "Image") 
         self.setDisabled(False)
         
@@ -111,7 +128,7 @@ class TextConverterMenu(QDialog):
         if response[0]:  # Check if a valid file was selected
             imageLayer = ["isImg", response[0], 0, 0]
             self.addLayer(imageLayer, "Img")
-            self.drawOverlayImage(response[0])
+            self.drawOverlayImage(response[0], 0, 0)
         else:
             print("Import canceled or invalid file selected.")
         
@@ -155,11 +172,9 @@ class TextConverterMenu(QDialog):
             layerEditor.loadLayer(self.layersList[selected_index])
             layerEditor.exec()
             subLayer = layerEditor.conclude()   # Layer that will substitute the old one
-            #print(self.layersList[selected_index])
             self.layersList[selected_index] = subLayer
             if (subLayer[1] == ''): # Empty layers should be ignored
                 self.layersList.remove(subLayer)
-            #print('layers list after:', self.layersList)  # DEBUG
             self.updatePreview()
             self.setDisabled(False)
         
@@ -176,6 +191,7 @@ class TextConverterMenu(QDialog):
                 im.save(output_path)
             im.close()
         for layer_item in self.layersList:
+            print("Layer item: ", layer_item)
             if layer_item[0] == "isImg":
                 self.drawImage(layer_item)
             else:
@@ -208,13 +224,14 @@ class TextConverterMenu(QDialog):
         
         
     def drawImage(self, layer_item):
-        self.drawOverlayImage(layer_item[1])
+        self.drawOverlayImage(layer_item[1], layer_item[2], layer_item[3])
         self.savePreview()
         # TODO: ...
         
     def savePreview(self): 
         rect = self.graphicsScene.sceneRect() # Determine size of the scene's bounding rect      
         result_pixmap = QPixmap(int(rect.width()), int(rect.height()))
+        result_pixmap.fill(Qt.GlobalColor.transparent)
         painter = QPainter(result_pixmap)
         self.graphicsScene.render(painter, target=rect, source=rect) # Render the scene onto the QPixmap
         painter.end()    
@@ -222,10 +239,10 @@ class TextConverterMenu(QDialog):
         print("Preview saved!\n")
         
 
-    def drawOverlayImage(self, img_path):
+    def drawOverlayImage(self, img_path, x, y):
         overlay_pixmap = QPixmap(img_path)
         overlay_item = QGraphicsPixmapItem(overlay_pixmap)
-        overlay_item.setOffset(0, 0)
+        overlay_item.setOffset(x, y)
         self.graphicsScene.addItem(overlay_item)    
     
     def addLayer(self, layer_item, layer_name):
