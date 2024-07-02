@@ -48,7 +48,7 @@ class TextConverterMenu(QDialog):
         button2 = QPushButton("Add Image")
         button2.pressed.connect(self.addOverlayImage)
         button4 = QPushButton("Save Image")
-        button4.pressed.connect(self.savePreview)
+        button4.pressed.connect(self.saveFile)
         self.layersListWidget = QListWidget()
         self.layersListWidget.setDragEnabled(True)
         self.layersListWidget.setDragDropMode(QListWidget.DragDropMode.InternalMove)
@@ -79,8 +79,9 @@ class TextConverterMenu(QDialog):
         self.maximized = False
         self.show()
         
+        
     def updateLayerOrder(self):
-         # Create a new ordered list based on the QListWidget order
+        # Create a new ordered list based on the QListWidget order
         new_layers_list = []
         print("Before: ", self.layersList)
         for i in range(self.layersListWidget.count()):
@@ -92,12 +93,14 @@ class TextConverterMenu(QDialog):
         self.layersList = new_layers_list
         print("After: ", self.layersList)
         self.updatePreview()
+     
         
     def zoom(self, event):
         factor = 1.025
         if event.angleDelta().y() < 0:
             factor = 1.0 / factor
         self.graphicsView.setTransform(self.graphicsView.transform().scale(factor, factor))
+       
         
     def add3dText(self):
         self.setDisabled(True)
@@ -108,6 +111,7 @@ class TextConverterMenu(QDialog):
         self.addLayer(layer_item, layer_item[1]) 
         self.setDisabled(False)
     
+    
     def showImageEditWindow(self, path):
         self.setDisabled(True)
         imgDefMenu = ImgDefMenu()
@@ -115,6 +119,7 @@ class TextConverterMenu(QDialog):
         layer_item = imgDefMenu.conclude()
         self.addLayer(layer_item, "Image") 
         self.setDisabled(False)
+        
         
     def addOverlayImage(self):
         file_filter = 'Image File (*.png *.jpg)'
@@ -131,7 +136,6 @@ class TextConverterMenu(QDialog):
             self.drawOverlayImage(response[0], 0, 0)
         else:
             print("Import canceled or invalid file selected.")
-        
         
         
     def updatePreview(self):
@@ -151,7 +155,6 @@ class TextConverterMenu(QDialog):
         
         
     def onLayersItemClick(self):
-        #print('layers list before:', self.layersList)  # DEBUG
         self.setDisabled(True)
         selected_index = self.layersListWidget.currentRow()
         if (self.layersList[selected_index][0] == "isImg"):
@@ -160,11 +163,9 @@ class TextConverterMenu(QDialog):
             layerEditor.loadLayer(self.layersList[selected_index])
             layerEditor.exec()
             subLayer = layerEditor.conclude()   # Layer that will substitute the old one
-            #print(self.layersList[selected_index])
             self.layersList[selected_index] = subLayer
             if (subLayer[1] == ''): # Empty layers should be ignored
                 self.layersList.remove(subLayer)
-            #print('layers list after:', self.layersList)  # DEBUG
             self.updatePreview()
             self.setDisabled(False)
         else:
@@ -178,6 +179,7 @@ class TextConverterMenu(QDialog):
             self.updatePreview()
             self.setDisabled(False)
         
+
     def deleteLayer(self, layerIndex):
         self.layersList.pop(layerIndex)
         self.updatePreview()
@@ -226,7 +228,7 @@ class TextConverterMenu(QDialog):
     def drawImage(self, layer_item):
         self.drawOverlayImage(layer_item[1], layer_item[2], layer_item[3])
         self.savePreview()
-        # TODO: ...
+        
         
     def savePreview(self): 
         rect = self.graphicsScene.sceneRect() # Determine size of the scene's bounding rect      
@@ -245,10 +247,12 @@ class TextConverterMenu(QDialog):
         overlay_item.setOffset(x, y)
         self.graphicsScene.addItem(overlay_item)    
     
+    
     def addLayer(self, layer_item, layer_name):
         self.layersList.append(layer_item)
         self.layersListWidget.addItem(layer_name)
         self.updatePreview()
+        
         
     def closeEvent(self, event):
         close = QMessageBox()
@@ -257,12 +261,12 @@ class TextConverterMenu(QDialog):
         close.setText("Are you sure?")
         close.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel)
         close = close.exec()
-
         if close == QMessageBox.StandardButton.Yes:
             event.accept()
             sys.exit()
         else:
             event.ignore()
+        
         
     # TODO: Tell user to press F for full screen
     def keyPressEvent(self,event: QKeyEvent):
@@ -276,3 +280,15 @@ class TextConverterMenu(QDialog):
             else:
                 self.maximized = False
                 self.showNormal()
+
+
+    def saveFile(self):
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.FileMode.AnyFile)
+        file_dialog.setNameFilter("Images (*.png *.jpg *.bmp);;All Files (*)")
+        file_dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
+        if file_dialog.exec() != QFileDialog.DialogCode.Accepted:
+            return
+        file_name = file_dialog.selectedFiles()[0]
+        if file_name:
+            self.pixmap.save(file_name)

@@ -20,6 +20,8 @@ class ImgDefMenu(QDialog):
         # Create Buttons, ComboBoxes,...
         self.applyButton = QPushButton('Apply')   # Button to confirm all textboxes
         self.applyButton.clicked.connect(self.conclude)
+        self.deleteLayerButton = QPushButton('Delete Layer')   # Button to delete layer
+        self.deleteLayerButton.clicked.connect(self.deleteLayer)
         self.xLabel = QLabel('x')  
         self.xSpinbox = QSpinBox()         # Spinbox for size
         self.xSpinbox.setRange(1, 1000)   # TODO: adjust range to an appropriate value
@@ -35,7 +37,8 @@ class ImgDefMenu(QDialog):
         self.layout.addWidget(self.xSpinbox, 5, 1)
         self.layout.addWidget(self.yLabel, 5, 2)
         self.layout.addWidget(self.ySpinbox, 5, 3)
-        self.layout.addWidget(self.applyButton, 6, 0, 1, 2)  # span two columns for the button
+        self.layout.addWidget(self.deleteLayerButton, 6, 1)
+        self.layout.addWidget(self.applyButton, 6, 0) 
 
         # Set column stretch to push items to the top
         self.layout.setColumnStretch(0, 1)
@@ -61,4 +64,10 @@ class ImgDefMenu(QDialog):
         self.userChoices = layer
         self.xSpinbox.setValue(layer[2])
         self.ySpinbox.setValue(layer[3])
+    
+    def deleteLayer(self):
+        self.close()
+        self.userChoices[1] = ''
+        return self.userChoices
+    
         

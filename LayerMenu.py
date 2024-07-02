@@ -81,8 +81,6 @@ class LayerMenu(QDialog):
         self.layout.addWidget(self.ySpinbox, 5, 3)
         self.layout.addWidget(self.applyButton, 6, 0)  # span two columns for the button
         self.layout.addWidget(self.deleteLayerButton, 6, 1)
-
-
         
         # Set column stretch to push items to the top
         self.layout.setColumnStretch(0, 1)
@@ -118,7 +116,7 @@ class LayerMenu(QDialog):
         return self.userChoices
     
     def deleteLayer(self):
-        self.titleTextbox.setText('')    # Get text from QLineEdit
+        self.titleTextbox.setText('') # Get text from QLineEdit
         self.close()
         return self.userChoices
     
