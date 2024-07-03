@@ -24,11 +24,11 @@ class ImgDefMenu(QDialog):
         self.deleteLayerButton.clicked.connect(self.deleteLayer)
         self.xLabel = QLabel('x')  
         self.xSpinbox = QSpinBox()         # Spinbox for size
-        self.xSpinbox.setRange(1, 1000)   # TODO: adjust range to an appropriate value
+        self.xSpinbox.setRange(0, 1000)   # TODO: adjust range to an appropriate value
         self.xSpinbox.setFixedWidth(150)
         self.yLabel = QLabel('y')  
         self.ySpinbox = QSpinBox()         # Spinbox for size
-        self.ySpinbox.setRange(1, 1000)   # TODO: adjust range to an appropriate value
+        self.ySpinbox.setRange(0, 1000)   # TODO: adjust range to an appropriate value
         self.ySpinbox.setFixedWidth(150)
           
         # Create grid layout

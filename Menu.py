@@ -8,7 +8,7 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.window_width, self.window_height = 500, 300
+        self.window_width, self.window_height = 500, 200
         self.setMinimumSize(self.window_width, self.window_height)
         self.setWindowTitle("Autodesign")
         self.setWindowIcon(QIcon("Resources/Icons/ACM_logo.jpg"))  # Provide the path to your icon image
