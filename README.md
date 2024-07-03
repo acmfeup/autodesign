@@ -4,12 +4,13 @@ The internal team's app that promises to facilitate the launch of marketing stra
 
 # Documentation
 
-* [App Instructions]()
-  * [Importing an image]()
-  * [Adding layers]()
-  * [Editing layers]()
-  * [Shortcuts]()
-* [Dependencies]()
+* [App Instructions](#App-Instructions)
+  * [Importing an image](#Importing-an-image)
+  * [Adding layers](#Adding-Layers)
+  * [Editing layers](#Editing-Layers)
+  * [Adding Custom Fonts](#Adding-Custom-Fonts)
+  * [Shortcuts](#Shortcuts)
+* [Dependencies](#Dependencies)
 
 ---
 
@@ -24,8 +25,7 @@ The first window that shows up allows the user to import an image, which will be
 </p>
 
 
-
-### Adding layers
+### Adding Layers
 
 You can add a new layer by clicking either the "Add text" or the "Add image" button. 
 
@@ -41,7 +41,7 @@ If you choose to add an image, a file dialog will open and you can choose an ima
     <img src="https://github.com/acmfeup/autodesign/blob/d91195baeaeab79c0b95b95128644bd174aea51c/Resources/Documentation/OpenImage.gif"/>
 </p>
 
-### Editing layers
+### Editing Layers
 
 The list widget enables you to change the order of the layers by dragging them or to edit a layer by double clicking it. If you choose to edit a layer, a new window will open where you can change your initial options.
 
@@ -58,6 +58,12 @@ You can also delete a layer:
 <p align="center">
     <img src="https://github.com/acmfeup/autodesign/blob/d91195baeaeab79c0b95b95128644bd174aea51c/Resources/Documentation/DeleteLayer.gif"/>
 </p>
+
+
+### Adding Custom Fonts
+
+You can add a font in .ttf format to the "Custom fonts" folder. Then you can select your font in the app, just like the other fonts.
+
 
 ### Shortcuts
 
