@@ -29,7 +29,7 @@ The first window that shows up allows the user to import an image, which will be
 
 You can add a new layer by clicking either the "Add text" or the "Add image" button. 
 
-The first one opens up a new window where you can specify the text you want to add and also choose a font ([you can also add custom fonts]()). When clicking "Apply" The preview image changes and a new text layer is added:
+The first one opens up a new window where you can specify the text you want to add and also choose a font ([you can also add custom fonts](#Adding-Custom-Fonts)). When clicking "Apply" The preview image changes and a new text layer is added:
 
 <p align="center">
     <img src="https://github.com/acmfeup/autodesign/blob/d91195baeaeab79c0b95b95128644bd174aea51c/Resources/Documentation/AddText.gif"/>
