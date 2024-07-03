@@ -112,7 +112,7 @@ class TextConverterMenu(QDialog):
         self.setDisabled(False)
     
     
-    def showImageEditWindow(self, path):
+    def showImageEditWindow(self):
         self.setDisabled(True)
         imgDefMenu = ImgDefMenu()
         imgDefMenu.exec()
@@ -186,7 +186,7 @@ class TextConverterMenu(QDialog):
         
         
     def drawLayers(self):
-        output_path = "output.png" # TODO: make this an option (to choose output file name)
+        output_path = "output.png"
         path = self.image_path
         if (self.layersList == []):
             with Image.open(path) as im:
@@ -237,7 +237,7 @@ class TextConverterMenu(QDialog):
         painter = QPainter(result_pixmap)
         self.graphicsScene.render(painter, target=rect, source=rect) # Render the scene onto the QPixmap
         painter.end()    
-        result_pixmap.save('output.png') # TODO: Change file name
+        result_pixmap.save('output.png')
         print("Preview saved!\n")
         
 

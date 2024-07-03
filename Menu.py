@@ -27,9 +27,6 @@ class MainWindow(QWidget):
         self.importImageButton.setFixedSize(buttonWidth, buttonHeight)
         self.importImageButton.setFont(QFont(buttonFont, buttonFontSize))
         self.importImageButton.pressed.connect(self.importImage)        
-        self.noImageButton = QPushButton("Create text without an image")        
-        self.noImageButton.setFixedSize(buttonWidth, buttonHeight)
-        self.noImageButton.setFont(QFont(buttonFont, buttonFontSize))
         
         # Create Layout
         self.layout = QVBoxLayout()
@@ -37,7 +34,6 @@ class MainWindow(QWidget):
         self.layout.addSpacing(30) 
         self.layout.addWidget(self.importImageButton, alignment=Qt.AlignmentFlag.AlignCenter)
         self.layout.addSpacing(buttonSpacing) 
-        self.layout.addWidget(self.noImageButton, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Set Layout
         self.setLayout(self.layout)
@@ -66,5 +62,3 @@ class MainWindow(QWidget):
         self.close()
         textConverter.exec()
         
-        
-    
