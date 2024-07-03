@@ -19,6 +19,11 @@ The internal team's app that promises to facilitate the launch of marketing stra
 
 The first window that shows up allows the user to import an image, which will be used as the base image.
 
+<p align="center">
+    <img src="https://github.com/acmfeup/autodesign/blob/d91195baeaeab79c0b95b95128644bd174aea51c/Resources/Documentation/Import.gif" />
+</p>
+
+
 
 ### Adding layers
 
@@ -27,22 +32,31 @@ You can add a new layer by clicking either the "Add text" or the "Add image" but
 The first one opens up a new window where you can specify the text you want to add and also choose a font ([you can also add custom fonts]()). When clicking "Apply" The preview image changes and a new text layer is added:
 
 <p align="center">
-    <img src="Documentation/Save.gif" width="600" height="350"/>
+    <img src="https://github.com/acmfeup/autodesign/blob/d91195baeaeab79c0b95b95128644bd174aea51c/Resources/Documentation/AddText.gif"/>
 </p>
 
 If you choose to add an image, a file dialog will open and you can choose an image to load onto a layer:
 
 <p align="center">
-    <img src="Documentation/Save.gif" width="600" height="350"/>
+    <img src="https://github.com/acmfeup/autodesign/blob/d91195baeaeab79c0b95b95128644bd174aea51c/Resources/Documentation/OpenImage.gif"/>
 </p>
 
 ### Editing layers
 
 The list widget enables you to change the order of the layers by dragging them or to edit a layer by double clicking it. If you choose to edit a layer, a new window will open where you can change your initial options.
+
+<p align="center">
+    <img src="https://github.com/acmfeup/autodesign/blob/d91195baeaeab79c0b95b95128644bd174aea51c/Resources/Documentation/ChangeLayer.gif"/>
+</p>
+
+<p align="center">
+    <img src="https://github.com/acmfeup/autodesign/blob/d91195baeaeab79c0b95b95128644bd174aea51c/Resources/Documentation/Drag.gif"/>
+</p>
+
 You can also delete a layer:
 
 <p align="center">
-    <img src="Documentation/Save.gif" width="600" height="350"/>
+    <img src="https://github.com/acmfeup/autodesign/blob/d91195baeaeab79c0b95b95128644bd174aea51c/Resources/Documentation/DeleteLayer.gif"/>
 </p>
 
 ### Shortcuts
@@ -50,7 +64,7 @@ You can also delete a layer:
 There is currently one shortcut in the app. You can press 'F' to toggle full screen
 
 <p align="center">
-    <img src="https://github.com/acmfeup/autodesign/blob/37ced62f6a68989d33178c543fba91c34b5449b0/Resources/Documentation/Zoom.gif" width="600" height="350"/>
+    <img src="https://github.com/acmfeup/autodesign/blob/37ced62f6a68989d33178c543fba91c34b5449b0/Resources/Documentation/Zoom.gif"/>
 </p>
 
 
@@ -59,7 +73,7 @@ There is currently one shortcut in the app. You can press 'F' to toggle full scr
 You can choose a location to save your image with the "Save Image" option
 
 <p align="center">
-    <img src="Documentation/Save.gif" width="600" height="350"/>
+    <img src="https://github.com/acmfeup/autodesign/blob/d91195baeaeab79c0b95b95128644bd174aea51c/Resources/Documentation/Save.gif"/>
 </p>
 
 
